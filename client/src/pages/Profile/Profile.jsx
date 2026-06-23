@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PageLayout } from '../../components/layout/PageLayout';
 import { PageLoader, Spinner } from '../../components/common/UI';
 import { useAuth } from '../../context/AuthContext';
@@ -111,11 +112,13 @@ const GameIcon = ({ gameId, size = 18 }) => {
 };
 
 export default function Profile() {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, logout } = useAuth();
   const { addToast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const [favTeams, setFavTeams] = useState([]);
   const [profile, setProfile] = useState({
     nickname: '',
@@ -179,6 +182,14 @@ export default function Profile() {
     }
   };
 
+  const handleLogout = () => {
+    setLoggingOut(true);
+    setTimeout(() => {
+      logout?.();
+      navigate('/login');
+    }, 650);
+  };
+
   if (loading)
     return (
       <PageLayout>
@@ -193,6 +204,20 @@ export default function Profile() {
       <style>{`
         @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
         @keyframes glowPulse { 0%,100%{box-shadow:0 0 20px rgba(168,0,255,.2)} 50%{box-shadow:0 0 36px rgba(168,0,255,.45)} }
+        @keyframes logoutFadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes logoutRingPulse {
+          0% { transform: scale(0.6); opacity: 0; box-shadow: 0 0 0 0 rgba(168,0,255,.55); }
+          40% { opacity: 1; }
+          100% { transform: scale(1.15); opacity: 0; box-shadow: 0 0 0 30px rgba(168,0,255,0); }
+        }
+        @keyframes logoutDoorOut {
+          0% { transform: translateX(0) rotate(0deg); opacity: 1; }
+          100% { transform: translateX(40px) rotate(8deg); opacity: 0; }
+        }
+        @keyframes logoutTextRise {
+          0% { opacity: 0; transform: translateY(10px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
         @media (max-width: 768px) {
           .profile-hero { flex-direction: column !important; align-items: flex-start !important; gap: 1.5rem !important; padding: 2rem !important; }
           .profile-games { flex-wrap: wrap !important; }
@@ -219,6 +244,45 @@ export default function Profile() {
             position: 'relative',
           }}
         >
+          <button
+            onClick={handleLogout}
+            title="Вийти з акаунту"
+            style={{
+              position: 'absolute',
+              top: 18,
+              right: 18,
+              background: 'rgba(255,68,68,0.08)',
+              border: '1px solid #3a1414',
+              color: '#888',
+              padding: '8px 14px',
+              borderRadius: 8,
+              cursor: 'pointer',
+              fontSize: '0.78rem',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              transition: 'all .2s',
+              zIndex: 2,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#ff4444';
+              e.currentTarget.style.color = '#ff6666';
+              e.currentTarget.style.background = 'rgba(255,68,68,0.12)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = '#3a1414';
+              e.currentTarget.style.color = '#888';
+              e.currentTarget.style.background = 'rgba(255,68,68,0.08)';
+            }}
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Вийти
+          </button>
           <div style={{ position: 'relative', flexShrink: 0 }}>
             <div
               style={{
@@ -481,6 +545,65 @@ export default function Profile() {
           )}
         </section>
       </div>
+
+      {loggingOut && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'radial-gradient(circle at center, #14001a 0%, #000 80%)',
+            zIndex: 999,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 20,
+            animation: 'logoutFadeIn 0.25s ease both',
+          }}
+        >
+          <div style={{ position: 'relative', width: 70, height: 70 }}>
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                borderRadius: '50%',
+                border: '2px solid rgba(168,0,255,.5)',
+                animation: 'logoutRingPulse 1s ease-out infinite',
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                borderRadius: '50%',
+                border: '1px solid #a800ff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: '#0d000f',
+                animation: 'logoutDoorOut 0.6s ease 0.05s both',
+              }}
+            >
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a800ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+            </div>
+          </div>
+          <div
+            style={{
+              color: '#aaa',
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              letterSpacing: '0.5px',
+              animation: 'logoutTextRise 0.4s ease 0.15s both',
+            }}
+          >
+            До зустрічі, {profile.nickname}…
+          </div>
+        </div>
+      )}
     </PageLayout>
   );
 }

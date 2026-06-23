@@ -48,7 +48,40 @@ export default function InteractiveMap({ tournaments = [], onCountryClick, onTou
 
   return (
     <div style={{ position: 'relative' }}>
-      {}
+      {/* Інлайн CSS фікс білого фону Leaflet саме для твого класу atlas-popup */}
+      <style>{`
+        .atlas-popup .leaflet-popup-content-wrapper {
+          background: #0a0a0a !important;
+          border: 1px solid #27272a !important;
+          border-radius: 12px !important;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7) !important;
+          padding: 4px !important;
+        }
+        .atlas-popup .leaflet-popup-content {
+          margin: 12px !important;
+          background: #0a0a0a !important;
+          width: auto !important;
+        }
+        .atlas-popup .leaflet-popup-tip-container {
+          margin-top: -1px !important;
+        }
+        .atlas-popup .leaflet-popup-tip {
+          background: #0a0a0a !important;
+          border-left: 1px solid #27272a !important;
+          border-bottom: 1px solid #27272a !important;
+          box-shadow: none !important;
+        }
+        .atlas-popup .leaflet-popup-close-button {
+          color: #a1a1aa !important;
+          padding: 10px 10px 0 0 !important;
+          font-size: 16px !important;
+        }
+        .atlas-popup .leaflet-popup-close-button:hover {
+          color: #ffffff !important;
+          background: transparent !important;
+        }
+      `}</style>
+
       <div style={styles.filterBar}>
         <span style={styles.filterLabel}>ДИСЦИПЛІНА</span>
         <div style={styles.filterPills}>
@@ -76,7 +109,6 @@ export default function InteractiveMap({ tournaments = [], onCountryClick, onTou
         </div>
       </div>
 
-      {}
       <MapContainer
         center={[20, 10]}
         zoom={2}
@@ -133,7 +165,6 @@ export default function InteractiveMap({ tournaments = [], onCountryClick, onTou
         })}
       </MapContainer>
 
-      {}
       <div style={styles.legend}>
         {DISCIPLINES.filter((d) => d.key !== 'all').map((d) => (
           <div key={d.key} style={styles.legendItem}>
@@ -143,7 +174,6 @@ export default function InteractiveMap({ tournaments = [], onCountryClick, onTou
         ))}
       </div>
 
-      {}
       {mappable.length === 0 && (
         <div style={styles.emptyOverlay}>
           <p style={{ color: '#555', fontSize: '0.8rem', fontWeight: 600 }}>

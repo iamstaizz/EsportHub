@@ -5,6 +5,28 @@ import { playerService, countryService } from '../../api/services';
 import { useToast } from '../../context/ToastContext';
 import styles from './Players.module.css';
 
+function HeaderTooltip({ label, tooltip, sortable, active, direction, onClick }) {
+  const [hover, setHover] = useState(false);
+
+  return (
+    <div
+      className={styles.thInner}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onClick={sortable ? onClick : undefined}
+      style={{ cursor: sortable ? 'pointer' : 'default' }}
+    >
+      <span style={{ color: active ? '#a800ff' : undefined }}>{label}</span>
+      {sortable && (
+        <span className={styles.sortArrow} style={{ opacity: active ? 1 : 0.35 }}>
+          {active && direction === 'asc' ? '▲' : '▼'}
+        </span>
+      )}
+      {tooltip && hover && <div className={styles.tooltipBox}>{tooltip}</div>}
+    </div>
+  );
+}
+
 function TransferTimeline({ transfers, loading, error }) {
   if (loading) {
     return (
@@ -28,10 +50,10 @@ function TransferTimeline({ transfers, loading, error }) {
       {transfers.map((t, idx) => {
         const date = t.transferDate
           ? new Date(t.transferDate).toLocaleDateString('uk-UA', {
-              day: '2-digit',
-              month: 'short',
-              year: 'numeric',
-            })
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+          })
           : '—';
 
         const statusColor =
@@ -186,6 +208,8 @@ export default function Players() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
+  const [sortKey, setSortKey] = useState(null);
+  const [sortDir, setSortDir] = useState('desc');
 
   useEffect(() => {
     const initPage = async () => {
@@ -208,8 +232,16 @@ export default function Players() {
     initPage();
   }, [addToast]);
 
+  const playersWithStats = useMemo(() => {
+    return players.map((p) => ({
+      ...p,
+      kd: p.kd ?? +(0.8 + Math.random() * 0.7).toFixed(2),
+      rating: p.rating ?? +(0.9 + Math.random() * 0.4).toFixed(2),
+    }));
+  }, [players]);
+
   const filteredPlayers = useMemo(() => {
-    return players.filter((player) => {
+    const result = playersWithStats.filter((player) => {
       const matchesCountry = selectedCountry
         ? player.country === selectedCountry || String(player.country_id) === selectedCountry
         : true;
@@ -220,7 +252,30 @@ export default function Players() {
 
       return matchesCountry && matchesSearch;
     });
-  }, [players, selectedCountry, search]);
+
+    if (sortKey) {
+      result.sort((a, b) => {
+        const diff = (a[sortKey] ?? 0) - (b[sortKey] ?? 0);
+        return sortDir === 'asc' ? diff : -diff;
+      });
+    }
+
+    return result;
+  }, [playersWithStats, selectedCountry, search, sortKey, sortDir]);
+
+  const handleSort = useCallback(
+    (key) => {
+      setSortKey((prevKey) => {
+        if (prevKey === key) {
+          setSortDir((prevDir) => (prevDir === 'desc' ? 'asc' : 'desc'));
+          return key;
+        }
+        setSortDir('desc');
+        return key;
+      });
+    },
+    []
+  );
 
   const handleRowClick = useCallback((player) => {
     setSelectedPlayer(player);
@@ -335,56 +390,74 @@ export default function Players() {
           ) : (
             <table className="players-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ textAlign: 'left', color: '#555', borderBottom: '1px solid #1a1a1a' }}>
-                  <th style={{ padding: '12px' }}>#</th>
-                  <th style={{ padding: '12px' }}>Гравець</th>
-                  <th style={{ padding: '12px' }}>Команда</th>
-                  <th style={{ padding: '12px' }}>Країна</th>
-                  <th style={{ padding: '12px' }}>K/D</th>
-                  <th style={{ padding: '12px' }}>Rating</th>
-                  <th style={{ padding: '12px' }}></th>
-                </tr>
+              <tr style={{ textAlign: 'left', color: '#555', borderBottom: '1px solid #1a1a1a' }}>
+                <th style={{ padding: '12px' }}>#</th>
+                <th style={{ padding: '12px' }}>Гравець</th>
+                <th style={{ padding: '12px' }}>Команда</th>
+                <th style={{ padding: '12px' }}>Країна</th>
+                <th style={{ padding: '12px', position: 'relative' }}>
+                  <HeaderTooltip
+                    label="K/D"
+                    tooltip="Співвідношення вбивств до смертей (Kills/Deaths). Чим вище — тим ефективніше гравець знищує суперників відносно власних смертей."
+                    sortable
+                    active={sortKey === 'kd'}
+                    direction={sortDir}
+                    onClick={() => handleSort('kd')}
+                  />
+                </th>
+                <th style={{ padding: '12px', position: 'relative' }}>
+                  <HeaderTooltip
+                    label="Rating"
+                    tooltip="Загальний рейтинг ефективності гравця, що враховує внесок у перемоги команди — вбивства, асисти, виживання та вплив на матч."
+                    sortable
+                    active={sortKey === 'rating'}
+                    direction={sortDir}
+                    onClick={() => handleSort('rating')}
+                  />
+                </th>
+                <th style={{ padding: '12px' }}></th>
+              </tr>
               </thead>
               <tbody>
-                {filteredPlayers.map((p, idx) => {
-                  const kd = (0.8 + Math.random() * 0.7).toFixed(2);
-                  const rating = (0.9 + Math.random() * 0.4).toFixed(2);
-                  const isSelected = selectedPlayer?.player_id === p.player_id;
+              {filteredPlayers.map((p, idx) => {
+                const kd = p.kd;
+                const rating = p.rating;
+                const isSelected = selectedPlayer?.player_id === p.player_id;
 
-                  return (
-                    <tr
-                      key={p.player_id || idx}
-                      className={styles.playerRow}
-                      style={{
-                        borderBottom: '1px solid #111',
-                        color: '#ccc',
-                        background: isSelected ? 'rgba(168,0,255,0.06)' : 'transparent',
-                        cursor: 'pointer',
-                      }}
-                      onClick={() => handleRowClick(p)}
-                    >
-                      <td style={{ padding: '12px' }}>{idx + 1}</td>
-                      <td style={{ padding: '12px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          {p.team_logo && (
-                            <img
-                              src={p.team_logo}
-                              alt=""
-                              style={{ width: '30px', height: '30px', borderRadius: '50%' }}
-                            />
-                          )}
-                          <div>
-                            <div style={{ color: '#fff', fontWeight: 'bold' }}>{p.nickname}</div>
-                            <div style={{ fontSize: '0.8rem', color: '#555' }}>{p.real_name}</div>
-                          </div>
+                return (
+                  <tr
+                    key={p.player_id || idx}
+                    className={styles.playerRow}
+                    style={{
+                      borderBottom: '1px solid #111',
+                      color: '#ccc',
+                      background: isSelected ? 'rgba(168,0,255,0.06)' : 'transparent',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => handleRowClick(p)}
+                  >
+                    <td style={{ padding: '12px' }}>{idx + 1}</td>
+                    <td style={{ padding: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        {p.team_logo && (
+                          <img
+                            src={p.team_logo}
+                            alt=""
+                            style={{ width: '30px', height: '30px', borderRadius: '50%' }}
+                          />
+                        )}
+                        <div>
+                          <div style={{ color: '#fff', fontWeight: 'bold' }}>{p.nickname}</div>
+                          <div style={{ fontSize: '0.8rem', color: '#555' }}>{p.real_name}</div>
                         </div>
-                      </td>
-                      <td style={{ padding: '12px', color: '#a800ff' }}>{p.team || '—'}</td>
-                      <td style={{ padding: '12px' }}>{p.country}</td>
-                      <td style={{ padding: '12px', color: kd >= 1 ? '#4ade80' : '#ff0055' }}>
-                        {kd}
-                      </td>
-                      <td style={{ padding: '12px' }}>
+                      </div>
+                    </td>
+                    <td style={{ padding: '12px', color: '#a800ff' }}>{p.team || '—'}</td>
+                    <td style={{ padding: '12px' }}>{p.country}</td>
+                    <td style={{ padding: '12px', color: kd >= 1 ? '#4ade80' : '#ff0055' }}>
+                      {kd}
+                    </td>
+                    <td style={{ padding: '12px' }}>
                         <span
                           style={{
                             background: rating >= 1.1 ? 'rgba(168, 0, 255, 0.2)' : '#1a1a1a',
@@ -395,13 +468,13 @@ export default function Players() {
                         >
                           {rating}
                         </span>
-                      </td>
-                      <td style={{ padding: '12px' }}>
-                        <span className={styles.transferHint}>↔ Трансфери</span>
-                      </td>
-                    </tr>
-                  );
-                })}
+                    </td>
+                    <td style={{ padding: '12px' }}>
+                      <span className={styles.transferHint}>↔ Трансфери</span>
+                    </td>
+                  </tr>
+                );
+              })}
               </tbody>
             </table>
           )}

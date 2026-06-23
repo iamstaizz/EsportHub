@@ -123,3 +123,36 @@
   top: 8px !important;
   right: 10px !important;
 }
+/* --- ПЕРЕВИЗНАЧЕННЯ ДЕФОЛТНИХ СТИЛІВ LEAFLET POPUP --- */
+
+:global(.leaflet-popup-content-wrapper) {
+  background: #0a0a0a !important; /* Чорний матовий фон */
+  border: 1px solid #27272a !important; /* Тонка темна рамка */
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+  padding: 4px !important;
+}
+
+:global(.leaflet-popup-content) {
+  margin: 12px !important;
+  background: #0a0a0a !important;
+}
+
+/* Прибираємо дефолтний білий трикутник (стрілочку) знизу */
+:global(.leaflet-popup-tip) {
+  background: #0a0a0a !important;
+  border-left: 1px solid #27272a !important;
+  border-bottom: 1px solid #27272a !important;
+  box-shadow: none !important;
+}
+
+/* Кнопка закриття попапу (хрестик) */
+:global(.leaflet-popup-close-button) {
+  color: #a1a1aa !important;
+  padding: 8px 8px 0 0 !important;
+}
+
+:global(.leaflet-popup-close-button:hover) {
+  color: #ffffff !important;
+  background: transparent !important;
+}
