@@ -1,158 +1,482 @@
-.dashboard {
-  background-color: #000;
-  color: #fff;
-  min-height: 100vh;
-  padding: 0 8%;
-  font-family: 'Inter', sans-serif;
+/* ===== Theme tokens (global custom properties, set on documentElement) ===== */
+:root {
+  --bg-primary: #000;
+  --bg-surface: #0a0a0a;
+  --bg-surface-alt: #070707;
+  --bg-elevated: #050505;
+  --bg-map: #04000a;
+
+  --border-subtle: #111;
+  --border: #1a1a1a;
+  --border-strong: #333;
+  --border-accent: #1a0033;
+
+  --text-primary: #fff;
+  --text-secondary: #eee;
+  --text-muted: #888;
+  --text-faint: #666;
+  --text-dim: #555;
+  --text-disabled: #444;
+  --text-ghost: #333;
+  --text-ghost-2: #222;
+
+  --accent: #a800ff;
+  --accent-contrast: #000;
+  --accent-soft: rgba(168, 0, 255, 0.05);
+  --accent-soft-strong: rgba(168, 0, 255, 0.1);
+  --accent-pill-count-bg: rgba(255, 255, 255, 0.15);
+
+  --danger: #ff0055;
+  --danger-soft: rgba(255, 0, 85, 0.04);
+  --danger-border: rgba(255, 0, 85, 0.3);
+  --danger-border-hover: rgba(255, 0, 85, 0.6);
+
+  --shadow-color: rgba(0, 0, 0, 0.8);
+  --shadow-color-soft: rgba(0, 0, 0, 0.5);
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+[data-theme='light'] {
+  --bg-primary: #f6f5f9;
+  --bg-surface: #ffffff;
+  --bg-surface-alt: #ffffff;
+  --bg-elevated: #ffffff;
+  --bg-map: #eef0f7;
+
+  --border-subtle: #ececf2;
+  --border: #e2e1ea;
+  --border-strong: #cfcdda;
+  --border-accent: #e7d6ff;
+
+  --text-primary: #14121a;
+  --text-secondary: #1f1d27;
+  --text-muted: #5a5868;
+  --text-faint: #6e6c7a;
+  --text-dim: #84818f;
+  --text-disabled: #9794a1;
+  --text-ghost: #aaa7b3;
+  --text-ghost-2: #c2bfca;
+
+  --accent: #8a00d6;
+  --accent-contrast: #fff;
+  --accent-soft: rgba(138, 0, 214, 0.06);
+  --accent-soft-strong: rgba(138, 0, 214, 0.12);
+  --accent-pill-count-bg: rgba(0, 0, 0, 0.08);
+
+  --danger: #d6003f;
+  --danger-soft: rgba(214, 0, 63, 0.05);
+  --danger-border: rgba(214, 0, 63, 0.25);
+  --danger-border-hover: rgba(214, 0, 63, 0.5);
+
+  --shadow-color: rgba(20, 18, 26, 0.12);
+  --shadow-color-soft: rgba(20, 18, 26, 0.08);
+}
+
+/* ===== Layout ===== */
+.page {
   padding: 2rem 0;
+  color: var(--text-primary);
 }
 
-.logo {
-  font-size: 1.8rem;
+.welcomeBlock {
+  margin-bottom: 3.5rem;
+}
+
+.welcomeTitle {
+  margin: 0;
+  font-size: 3rem;
   font-weight: 900;
-  color: #bc33ff;
-  cursor: pointer;
+  color: var(--text-primary);
+  letter-spacing: -1px;
+  line-height: 1.15;
 }
 
-.nav { display: flex; gap: 2.5rem; }
-.nav a { color: #fff; text-decoration: none; font-size: 0.85rem; opacity: 0.8; }
-.activeLink { color: #bc33ff !important; opacity: 1 !important; }
-
-.headerIcons { display: flex; align-items: center; gap: 1.5rem; }
-.iconBtn { background: none; border: none; cursor: pointer; opacity: 0.8; }
-.avatarCircle {
-  width: 35px; height: 35px; background: #333; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
-  border: 1px solid #bc33ff;
-}
-
-.welcomeRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 2rem 0 4rem;
-}
-
-.welcomeTitle h1 { font-size: 2rem; font-weight: 700; margin: 0; }
-.welcomeTitle h1 span { color: #bc33ff; }
-.welcomeTitle p { color: #888; font-size: 0.9rem; margin-top: 0.5rem; }
-
-.controls { display: flex; gap: 1rem; }
-.searchBox {
-  position: relative;
-  background: #000;
-  border: 1px solid #333;
-  border-radius: 8px;
-  display: flex; align-items: center;
-  padding: 0 1rem;
-}
-.searchBox input {
-  background: transparent; border: none; color: #fff; padding: 0.6rem 0; width: 180px; outline: none; font-size: 0.8rem;
-}
-
-.filterBtn {
-  background: #000; border: 1px solid #333; border-radius: 8px;
-  width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer;
+.welcomeSubtitle {
+  margin: 15px 0 0 0;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  font-weight: 500;
 }
 
 .contentGrid {
   display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 10%;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 50px;
 }
 
-.sectionTitle { font-size: 1rem; font-weight: 600; margin-bottom: 2rem; }
+.sectionHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 
-.matchRow {
+.sectionHeaderLeft {
   display: flex;
   align-items: center;
-  padding: 1.2rem 0;
-  border-bottom: 1px solid #222;
-  transition: 0.3s;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.matchRow:hover { border-bottom-color: #bc33ff; }
-
-.teamLogo {
-  width: 45px; height: 45px; background: #1a1a1a; border-radius: 50%;
-  background-size: cover; border: 1px solid #333;
-}
-
-.matchInfo { flex: 1; text-align: center; }
-.matchTime { font-size: 1.2rem; font-weight: 800; }
-.matchTeamsNames { font-size: 0.65rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
-.vsText { color: #bc33ff; margin: 0 4px; }
-
-.matchChevron { color: #444; margin-left: 1rem; font-size: 0.9rem; }
-
-.mapSection { width: 100%; }
-.mapContainer {
-  height: 400px; background: #000; border-radius: 20px;
-}
-
-.footer {
-  margin-top: 6rem; padding: 2rem 0; border-top: 1px solid #111;
-  display: flex; justify-content: space-between; color: #444; font-size: 0.75rem;
-}
-.footer a { color: #444; text-decoration: none; margin: 0 5px; }
-
-.atlas-popup .leaflet-popup-content-wrapper {
-  background: #0a0a0a;
-  border: 1px solid #1a0033;
-  border-radius: 10px;
-  box-shadow: 0 8px 32px rgba(168, 0, 255, 0.2);
-  color: #eee;
-  font-family: 'Inter', sans-serif;
-  padding: 0;
-}
-.atlas-popup .leaflet-popup-content {
+.sectionLabel {
+  font-size: 0.75rem;
+  color: var(--text-disabled);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
   margin: 0;
 }
-.atlas-popup .leaflet-popup-tip {
-  background: #1a0033;
-}
-.atlas-popup .leaflet-popup-close-button {
-  color: #444 !important;
-  font-size: 1rem !important;
-  top: 8px !important;
-  right: 10px !important;
-}
-/* --- ПЕРЕВИЗНАЧЕННЯ ДЕФОЛТНИХ СТИЛІВ LEAFLET POPUP --- */
 
-:global(.leaflet-popup-content-wrapper) {
-  background: #0a0a0a !important; /* Чорний матовий фон */
-  border: 1px solid #27272a !important; /* Тонка темна рамка */
-  border-radius: 12px !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
-  padding: 4px !important;
+.searchInput {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  outline: none;
+  width: 120px;
+  max-width: 100%;
 }
 
-:global(.leaflet-popup-content) {
-  margin: 12px !important;
-  background: #0a0a0a !important;
+.matchList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-/* Прибираємо дефолтний білий трикутник (стрілочку) знизу */
-:global(.leaflet-popup-tip) {
-  background: #0a0a0a !important;
-  border-left: 1px solid #27272a !important;
-  border-bottom: 1px solid #27272a !important;
-  box-shadow: none !important;
+.emptyState {
+  color: var(--text-ghost);
+  font-size: 0.8rem;
+  text-align: center;
+  padding: 30px 0;
 }
 
-/* Кнопка закриття попапу (хрестик) */
-:global(.leaflet-popup-close-button) {
-  color: #a1a1aa !important;
-  padding: 8px 8px 0 0 !important;
+.viewAllBtn {
+  margin-top: 16px;
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: border-color 0.2s, background 0.2s;
+  font-family: inherit;
 }
 
-:global(.leaflet-popup-close-button:hover) {
-  color: #ffffff !important;
-  background: transparent !important;
+.viewAllBtn:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.viewAllCount {
+  background: var(--border-accent);
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 0.6rem;
+  color: var(--accent);
+}
+
+.mapPanel {
+  background: var(--bg-map);
+  border: 1px solid var(--border-accent);
+  border-radius: 20px;
+  padding: 30px;
+  position: relative;
+}
+
+/* ===== Match card ===== */
+.matchCard {
+  display: flex;
+  align-items: center;
+  padding: 14px 18px;
+  background: var(--bg-surface-alt);
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.matchCard:hover {
+  border-color: var(--accent-soft-strong);
+}
+
+.matchCardLive {
+  background: var(--danger-soft);
+  border-color: var(--danger-border);
+}
+
+.matchCardLive:hover {
+  border-color: var(--danger-border-hover);
+}
+
+.matchLiveBar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--danger);
+}
+
+.teamName {
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+
+.matchTime {
+  font-size: 0.6rem;
+  color: var(--text-ghost);
+}
+
+.vsLabel {
+  font-weight: 900;
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+.scoreLabel {
+  font-weight: 900;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  color: var(--text-primary);
+}
+
+.scoreLabelFinished {
+  color: var(--text-dim);
+}
+
+.scoreSeparator {
+  color: var(--text-ghost-2);
+}
+
+.statusBadge {
+  font-size: 0.55rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+.reminderBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: -420px;
+  width: 400px;
+  max-width: 100vw;
+  height: 100vh;
+  background: var(--bg-elevated);
+  border-left: 1px solid var(--accent);
+  z-index: 10000;
+  transition: right 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+  padding: 50px 40px;
+  box-shadow: -20px 0 60px var(--shadow-color);
+  overflow-y: auto;
+  color: var(--text-primary);
+}
+
+.sidebarOpen {
+  right: 0;
+}
+
+.sidebarHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.sidebarTitle {
+  color: var(--text-primary);
+  font-size: 1.4rem;
+  font-weight: 900;
+}
+
+.sidebarCloseBtn {
+  background: none;
+  border: none;
+  color: var(--text-disabled);
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.sidebarTeamItem {
+  padding: 20px;
+  background: var(--bg-surface);
+  border-left: 4px solid var(--accent);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sidebarDetailCard {
+  background: var(--bg-surface);
+  padding: 16px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+
+.sidebarDetailLabel {
+  color: var(--text-disabled);
+  display: block;
+  font-size: 0.6rem;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+
+.sidebarDetailValue {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* ===== Notification bell dropdown ===== */
+.notifPanel {
+  position: absolute;
+  top: 35px;
+  right: 0;
+  width: 300px;
+  max-width: calc(100vw - 24px);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  z-index: 9999;
+  box-shadow: 0 10px 40px var(--shadow-color);
+  overflow: hidden;
+}
+
+.notifHeader {
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+
+.notifEmpty {
+  padding: 20px;
+  font-size: 0.75rem;
+  color: var(--text-disabled);
+  text-align: center;
+}
+
+.notifItem {
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--bg-elevated);
+}
+
+.notifMessage {
+  margin: 0 0 4px 0;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.notifTime {
+  color: var(--text-ghost);
+  font-size: 0.65rem;
+}
+
+/* ===== Responsive: tablets ===== */
+@media (max-width: 980px) {
+  .contentGrid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .welcomeTitle {
+    font-size: 2.4rem;
+  }
+}
+
+/* ===== Responsive: mobile ===== */
+@media (max-width: 640px) {
+  .page {
+    padding: 1.25rem 0;
+  }
+
+  .welcomeBlock {
+    margin-bottom: 2.25rem;
+  }
+
+  .welcomeTitle {
+    font-size: 1.8rem;
+    letter-spacing: -0.5px;
+  }
+
+  .welcomeSubtitle {
+    font-size: 0.95rem;
+  }
+
+  .contentGrid {
+    gap: 28px;
+  }
+
+  .sectionHeaderRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .searchInput {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .matchCard {
+    padding: 12px 12px;
+    gap: 8px;
+  }
+
+  .teamName {
+    font-size: 0.74rem;
+  }
+
+  .mapPanel {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .sidebar {
+    width: 100%;
+    right: -100%;
+    padding: 32px 20px;
+  }
+
+  .sidebarOpen {
+    right: 0;
+  }
+
+  .sidebarTitle {
+    font-size: 1.15rem;
+  }
+
+  .notifPanel {
+    width: calc(100vw - 24px);
+    right: -8px;
+  }
 }

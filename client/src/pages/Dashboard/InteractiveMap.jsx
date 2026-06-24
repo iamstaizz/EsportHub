@@ -48,43 +48,55 @@ export default function InteractiveMap({ tournaments = [], onCountryClick, onTou
 
   return (
     <div style={{ position: 'relative' }}>
-      {/* Інлайн CSS фікс білого фону Leaflet саме для твого класу atlas-popup */}
+      {/* Theme-aware Leaflet popup + mobile layout fixes */}
       <style>{`
         .atlas-popup .leaflet-popup-content-wrapper {
-          background: #0a0a0a !important;
-          border: 1px solid #27272a !important;
+          background: var(--bg-surface, #0a0a0a) !important;
+          border: 1px solid var(--border, #27272a) !important;
           border-radius: 12px !important;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7) !important;
+          box-shadow: 0 10px 30px var(--shadow-color-soft, rgba(0, 0, 0, 0.7)) !important;
           padding: 4px !important;
         }
         .atlas-popup .leaflet-popup-content {
           margin: 12px !important;
-          background: #0a0a0a !important;
+          background: var(--bg-surface, #0a0a0a) !important;
           width: auto !important;
         }
         .atlas-popup .leaflet-popup-tip-container {
           margin-top: -1px !important;
         }
         .atlas-popup .leaflet-popup-tip {
-          background: #0a0a0a !important;
-          border-left: 1px solid #27272a !important;
-          border-bottom: 1px solid #27272a !important;
+          background: var(--bg-surface, #0a0a0a) !important;
+          border-left: 1px solid var(--border, #27272a) !important;
+          border-bottom: 1px solid var(--border, #27272a) !important;
           box-shadow: none !important;
         }
         .atlas-popup .leaflet-popup-close-button {
-          color: #a1a1aa !important;
+          color: var(--text-disabled, #a1a1aa) !important;
           padding: 10px 10px 0 0 !important;
           font-size: 16px !important;
         }
         .atlas-popup .leaflet-popup-close-button:hover {
-          color: #ffffff !important;
+          color: var(--text-primary, #ffffff) !important;
           background: transparent !important;
+        }
+
+        @media (max-width: 640px) {
+          .atlas-map-box {
+            height: 280px !important;
+          }
+          .atlas-filter-bar {
+            gap: 0.6rem !important;
+          }
+          .atlas-filter-pills {
+            gap: 6px !important;
+          }
         }
       `}</style>
 
-      <div style={styles.filterBar}>
+      <div className="atlas-filter-bar" style={styles.filterBar}>
         <span style={styles.filterLabel}>ДИСЦИПЛІНА</span>
-        <div style={styles.filterPills}>
+        <div className="atlas-filter-pills" style={styles.filterPills}>
           {DISCIPLINES.map((d) => (
             <button
               key={d.key}
@@ -115,6 +127,7 @@ export default function InteractiveMap({ tournaments = [], onCountryClick, onTou
         minZoom={2}
         maxZoom={8}
         style={styles.map}
+        className="atlas-map-box"
         zoomControl={false}
         worldCopyJump={true}
         attributionControl={false}
@@ -176,7 +189,7 @@ export default function InteractiveMap({ tournaments = [], onCountryClick, onTou
 
       {mappable.length === 0 && (
         <div style={styles.emptyOverlay}>
-          <p style={{ color: '#555', fontSize: '0.8rem', fontWeight: 600 }}>
+          <p style={{ color: 'var(--text-dim, #555)', fontSize: '0.8rem', fontWeight: 600 }}>
             Немає турнірів для цієї дисципліни
           </p>
         </div>
@@ -229,7 +242,7 @@ const styles = {
     flexWrap: 'wrap',
   },
   filterLabel: {
-    color: '#444',
+    color: 'var(--text-disabled, #444)',
     fontSize: '0.6rem',
     fontWeight: 900,
     letterSpacing: '2px',
@@ -256,7 +269,7 @@ const styles = {
     fontFamily: 'inherit',
   },
   pillCount: {
-    background: 'rgba(255,255,255,0.15)',
+    background: 'var(--accent-pill-count-bg, rgba(255,255,255,0.15))',
     borderRadius: '10px',
     padding: '1px 6px',
     fontSize: '0.6rem',
@@ -266,19 +279,20 @@ const styles = {
     width: '100%',
     borderRadius: '14px',
     overflow: 'hidden',
-    background: '#04000a',
+    background: 'var(--bg-map, #04000a)',
   },
   legend: {
     display: 'flex',
     gap: '16px',
     marginTop: '12px',
     paddingLeft: '4px',
+    flexWrap: 'wrap',
   },
   legendItem: {
     display: 'flex',
     alignItems: 'center',
     gap: '6px',
-    color: '#555',
+    color: 'var(--text-dim, #555)',
     fontSize: '0.68rem',
     fontWeight: 600,
     letterSpacing: '0.5px',
@@ -298,8 +312,8 @@ const styles = {
     textAlign: 'center',
   },
   popup: {
-    background: '#0a0a0a',
-    color: '#eee',
+    background: 'var(--bg-surface, #0a0a0a)',
+    color: 'var(--text-secondary, #eee)',
     minWidth: '160px',
     fontFamily: 'inherit',
   },
@@ -316,12 +330,12 @@ const styles = {
   popupName: {
     fontWeight: 800,
     fontSize: '0.9rem',
-    color: '#fff',
+    color: 'var(--text-primary, #fff)',
     marginBottom: '4px',
     lineHeight: 1.3,
   },
   popupLocation: {
-    color: '#555',
+    color: 'var(--text-dim, #555)',
     fontSize: '0.72rem',
     marginBottom: '12px',
   },

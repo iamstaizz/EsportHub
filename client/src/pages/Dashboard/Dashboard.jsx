@@ -6,26 +6,17 @@ import { PageLoader, ErrorState } from '../../components/common/UI';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { matchService, tournamentService, countryService } from '../../api/services';
+import styles from './Dashboard.module.css';
 
 function MatchStatusBadge({ status }) {
   const cfg = {
-    live: { label: '● LIVE', bg: '#ff0055', color: '#fff' },
-    upcoming: { label: 'НЕЗАБАРОМ', bg: '#1a1a1a', color: '#a800ff' },
-    finished: { label: 'ЗАВЕРШЕНО', bg: '#111', color: '#444' },
+    live: { label: '● LIVE', bg: 'var(--danger)', color: '#fff' },
+    upcoming: { label: 'НЕЗАБАРОМ', bg: 'var(--bg-surface)', color: 'var(--accent)' },
+    finished: { label: 'ЗАВЕРШЕНО', bg: 'var(--bg-elevated)', color: 'var(--text-disabled)' },
   };
   const s = cfg[status] || cfg.upcoming;
   return (
-    <span
-      style={{
-        fontSize: '0.55rem',
-        fontWeight: 900,
-        letterSpacing: '1px',
-        padding: '3px 8px',
-        borderRadius: '20px',
-        background: s.bg,
-        color: s.color,
-      }}
-    >
+    <span className={styles.statusBadge} style={{ background: s.bg, color: s.color }}>
       {s.label}
     </span>
   );
@@ -53,95 +44,44 @@ function MatchCard({ match, isSubbed, onNavigate, onReminder }) {
   return (
     <div
       onClick={onNavigate}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        padding: '14px 18px',
-        background: isLive ? 'rgba(255,0,85,0.04)' : '#070707',
-        borderRadius: '12px',
-        border: `1px solid ${isLive ? 'rgba(255,0,85,0.3)' : '#111'}`,
-        cursor: 'pointer',
-        transition: 'border-color 0.2s, background 0.2s',
-        gap: '12px',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-      onMouseEnter={(e) =>
-        (e.currentTarget.style.borderColor = isLive ? 'rgba(255,0,85,0.6)' : '#a800ff33')
-      }
-      onMouseLeave={(e) =>
-        (e.currentTarget.style.borderColor = isLive ? 'rgba(255,0,85,0.3)' : '#111')
-      }
+      className={`${styles.matchCard} ${isLive ? styles.matchCardLive : ''}`}
     >
-      {}
-      {isLive && (
-        <div
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: '3px',
-            background: '#ff0055',
-          }}
-        />
-      )}
+      {isLive && <div className={styles.matchLiveBar} />}
 
-      {}
       <div style={{ flex: 1, textAlign: 'right' }}>
-        <div style={{ fontWeight: 700, fontSize: '0.82rem', color: '#eee', marginBottom: '2px' }}>
-          {t1}
-        </div>
-        {time && !showScore && <div style={{ fontSize: '0.6rem', color: '#333' }}>{time}</div>}
+        <div className={styles.teamName}>{t1}</div>
+        {time && !showScore && <div className={styles.matchTime}>{time}</div>}
       </div>
 
-      {}
       <div style={{ textAlign: 'center', minWidth: '64px' }}>
         {showScore ? (
-          <div
-            style={{
-              fontWeight: 900,
-              fontSize: '1.1rem',
-              color: isFinished ? '#555' : '#fff',
-              letterSpacing: '2px',
-            }}
-          >
-            {score1} <span style={{ color: '#222' }}>:</span> {score2}
+          <div className={`${styles.scoreLabel} ${isFinished ? styles.scoreLabelFinished : ''}`}>
+            {score1} <span className={styles.scoreSeparator}>:</span> {score2}
           </div>
         ) : (
-          <div style={{ fontWeight: 900, fontSize: '0.85rem', color: '#a800ff' }}>VS</div>
+          <div className={styles.vsLabel}>VS</div>
         )}
         <div style={{ marginTop: '4px' }}>
           <MatchStatusBadge status={status} />
         </div>
       </div>
 
-      {}
       <div style={{ flex: 1, textAlign: 'left' }}>
-        <div style={{ fontWeight: 700, fontSize: '0.82rem', color: '#eee', marginBottom: '2px' }}>
-          {t2}
-        </div>
-        {time && !showScore && <div style={{ fontSize: '0.6rem', color: '#333' }}>{time}</div>}
+        <div className={styles.teamName}>{t2}</div>
+        {time && !showScore && <div className={styles.matchTime}>{time}</div>}
       </div>
 
-      {}
       <button
         onClick={onReminder}
         title={isSubbed ? 'Скасувати нагадування' : 'Додати нагадування'}
-        style={{
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          padding: '4px',
-          flexShrink: 0,
-        }}
+        className={styles.reminderBtn}
       >
         <svg
           width="16"
           height="16"
           viewBox="0 0 24 24"
-          fill={isSubbed ? '#a800ff' : 'none'}
-          stroke={isSubbed ? '#a800ff' : '#333'}
+          fill={isSubbed ? 'var(--accent)' : 'none'}
+          stroke={isSubbed ? 'var(--accent)' : 'var(--border-strong)'}
           strokeWidth="2.5"
         >
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -308,7 +248,7 @@ export default function Dashboard() {
         height="22"
         viewBox="0 0 24 24"
         fill="none"
-        stroke={notifications.length > 0 ? '#a800ff' : '#555'}
+        stroke={notifications.length > 0 ? 'var(--accent)' : 'var(--text-dim)'}
         strokeWidth="2"
       >
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -320,7 +260,7 @@ export default function Dashboard() {
             position: 'absolute',
             top: -4,
             right: -4,
-            background: '#ff0055',
+            background: 'var(--danger)',
             color: '#fff',
             fontSize: '9px',
             width: '15px',
@@ -336,53 +276,16 @@ export default function Dashboard() {
         </div>
       )}
       {isNotifOpen && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '35px',
-            right: 0,
-            width: '300px',
-            background: '#0a0a0a',
-            border: '1px solid #1a1a1a',
-            borderRadius: '8px',
-            zIndex: 9999,
-            boxShadow: '0 10px 40px rgba(0,0,0,0.8)',
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              padding: '12px 15px',
-              borderBottom: '1px solid #1a1a1a',
-              fontSize: '0.7rem',
-              fontWeight: 800,
-              color: '#a800ff',
-              letterSpacing: '1px',
-            }}
-          >
-            ЦЕНТР СПОВІЩЕНЬ
-          </div>
+        <div className={styles.notifPanel}>
+          <div className={styles.notifHeader}>ЦЕНТР СПОВІЩЕНЬ</div>
           <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
             {notifications.length === 0 ? (
-              <div
-                style={{ padding: '20px', fontSize: '0.75rem', color: '#444', textAlign: 'center' }}
-              >
-                Немає нових сповіщень
-              </div>
+              <div className={styles.notifEmpty}>Немає нових сповіщень</div>
             ) : (
               notifications.map((n) => (
-                <div key={n.id} style={{ padding: '12px 15px', borderBottom: '1px solid #050505' }}>
-                  <p
-                    style={{
-                      margin: '0 0 4px 0',
-                      color: '#eee',
-                      fontSize: '0.75rem',
-                      lineHeight: '1.4',
-                    }}
-                  >
-                    {n.message}
-                  </p>
-                  <span style={{ color: '#333', fontSize: '0.65rem' }}>{n.created_at}</span>
+                <div key={n.id} className={styles.notifItem}>
+                  <p className={styles.notifMessage}>{n.message}</p>
+                  <span className={styles.notifTime}>{n.created_at}</span>
                 </div>
               ))
             )}
@@ -401,63 +304,23 @@ export default function Dashboard() {
 
   return (
     <PageLayout customHeaderActions={HeaderNotificationBell}>
-      <div style={{ padding: '2rem 0' }}>
-        {}
-        <div style={{ marginBottom: '3.5rem' }}>
-          <h1
-            style={{
-              margin: 0,
-              fontSize: '3rem',
-              fontWeight: 900,
-              color: '#fff',
-              letterSpacing: '-1px',
-            }}
-          >
-            Вітаємо, гравець <span style={{ color: '#a800ff' }}>{displayName}</span>
+      <div className={styles.page}>
+        <div className={styles.welcomeBlock}>
+          <h1 className={styles.welcomeTitle}>
+            Вітаємо, гравець <span style={{ color: 'var(--accent)' }}>{displayName}</span>
           </h1>
-          <p style={{ margin: '15px 0 0 0', color: '#666', fontSize: '1.2rem', fontWeight: 500 }}>
-            Твій центр кіберспортивної активності на сьогодні.
-          </p>
+          <p className={styles.welcomeSubtitle}>Твій центр кіберспортивної активності на сьогодні.</p>
         </div>
 
-        {}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: '50px' }}>
-          {}
+        <div className={styles.contentGrid}>
           <section>
-            {}
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '16px',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <h2
-                  style={{
-                    fontSize: '0.75rem',
-                    color: '#444',
-                    fontWeight: 900,
-                    textTransform: 'uppercase',
-                    letterSpacing: '2px',
-                    margin: 0,
-                  }}
-                >
-                  МАТЧІ СЬОГОДНІ
-                </h2>
+            <div className={styles.sectionHeaderRow}>
+              <div className={styles.sectionHeaderLeft}>
+                <h2 className={styles.sectionLabel}>МАТЧІ СЬОГОДНІ</h2>
                 {allMatches.some((m) => m.status === 'live') && (
                   <span
-                    style={{
-                      fontSize: '0.55rem',
-                      fontWeight: 900,
-                      letterSpacing: '1px',
-                      padding: '3px 8px',
-                      borderRadius: '20px',
-                      background: '#ff0055',
-                      color: '#fff',
-                      animation: 'pulse 2s infinite',
-                    }}
+                    className={styles.statusBadge}
+                    style={{ background: 'var(--danger)', color: '#fff', animation: 'pulse 2s infinite' }}
                   >
                     ● LIVE
                   </span>
@@ -468,34 +331,15 @@ export default function Dashboard() {
                 placeholder="ПОШУК..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                style={{
-                  background: '#0a0a0a',
-                  border: '1px solid #1a1a1a',
-                  color: '#fff',
-                  padding: '7px 12px',
-                  borderRadius: '6px',
-                  fontSize: '0.7rem',
-                  outline: 'none',
-                  width: '120px',
-                }}
+                className={styles.searchInput}
               />
             </div>
 
             {error && <ErrorState message={error} onRetry={refetch} />}
 
-            {}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div className={styles.matchList}>
               {topMatches.length === 0 && !loading && (
-                <div
-                  style={{
-                    color: '#333',
-                    fontSize: '0.8rem',
-                    textAlign: 'center',
-                    padding: '30px 0',
-                  }}
-                >
-                  Матчів не знайдено
-                </div>
+                <div className={styles.emptyState}>Матчів не знайдено</div>
               )}
               {topMatches.map((m) => {
                 const mId = m.matchId || m.match_id || m.id;
@@ -511,38 +355,7 @@ export default function Dashboard() {
               })}
             </div>
 
-            {}
-            <button
-              onClick={() => navigate('/matches')}
-              style={{
-                marginTop: '16px',
-                width: '100%',
-                padding: '12px',
-                background: 'transparent',
-                border: '1px solid #1a1a1a',
-                borderRadius: '10px',
-                color: '#a800ff',
-                fontSize: '0.72rem',
-                fontWeight: 800,
-                letterSpacing: '1.5px',
-                textTransform: 'uppercase',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                transition: 'border-color 0.2s, background 0.2s',
-                fontFamily: 'inherit',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#a800ff';
-                e.currentTarget.style.background = 'rgba(168,0,255,0.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = '#1a1a1a';
-                e.currentTarget.style.background = 'transparent';
-              }}
-            >
+            <button onClick={() => navigate('/matches')} className={styles.viewAllBtn}>
               <svg
                 width="14"
                 height="14"
@@ -555,45 +368,15 @@ export default function Dashboard() {
                 <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none" />
               </svg>
               Дивитися всі матчі
-              {hasMore && (
-                <span
-                  style={{
-                    background: '#1a0033',
-                    borderRadius: '10px',
-                    padding: '2px 8px',
-                    fontSize: '0.6rem',
-                    color: '#a800ff',
-                  }}
-                >
-                  +{filteredMatches.length - 5}
-                </span>
-              )}
+              {hasMore && <span className={styles.viewAllCount}>+{filteredMatches.length - 5}</span>}
             </button>
           </section>
 
-          {}
           <section>
-            <h2
-              style={{
-                fontSize: '0.75rem',
-                color: '#444',
-                fontWeight: 900,
-                textTransform: 'uppercase',
-                marginBottom: '20px',
-                letterSpacing: '2px',
-              }}
-            >
+            <h2 className={styles.sectionLabel} style={{ marginBottom: '20px' }}>
               ГЛОБАЛЬНА АРЕНА
             </h2>
-            <div
-              style={{
-                background: '#04000a',
-                border: '1px solid #1a0033',
-                borderRadius: '20px',
-                padding: '30px',
-                position: 'relative',
-              }}
-            >
+            <div className={styles.mapPanel}>
               <InteractiveMap
                 tournaments={tournaments}
                 onCountryClick={handleCountryClick}
@@ -603,44 +386,12 @@ export default function Dashboard() {
           </section>
         </div>
 
-        {}
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            right: isSidebarOpen ? 0 : '-420px',
-            width: '400px',
-            height: '100vh',
-            background: '#050505',
-            borderLeft: '1px solid #a800ff',
-            zIndex: 10000,
-            transition: '0.6s cubic-bezier(0.19, 1, 0.22, 1)',
-            padding: '50px 40px',
-            boxShadow: '-20px 0 60px rgba(0,0,0,0.9)',
-            overflowY: 'auto',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '40px',
-            }}
-          >
-            <h3 style={{ color: '#fff', fontSize: '1.4rem', fontWeight: 900 }}>
+        <div className={`${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : ''}`}>
+          <div className={styles.sidebarHeaderRow}>
+            <h3 className={styles.sidebarTitle}>
               {sidebarType === 'country' ? selectedCountry?.name?.toUpperCase() : 'LAN TOURNAMENT'}
             </h3>
-            <button
-              onClick={() => setIsSidebarOpen(false)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#444',
-                cursor: 'pointer',
-                fontSize: '1.2rem',
-              }}
-            >
+            <button onClick={() => setIsSidebarOpen(false)} className={styles.sidebarCloseBtn}>
               ✕
             </button>
           </div>
@@ -648,30 +399,14 @@ export default function Dashboard() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {sidebarType === 'country' &&
               countryTeams.map((t) => (
-                <div
-                  key={t.id || t.team_id}
-                  style={{
-                    padding: '20px',
-                    background: '#0a0a0a',
-                    borderLeft: '4px solid #a800ff',
-                    fontWeight: 700,
-                    color: '#fff',
-                  }}
-                >
+                <div key={t.id || t.team_id} className={styles.sidebarTeamItem}>
                   {t.name.toUpperCase()}
                 </div>
               ))}
 
             {sidebarType === 'tournament' && selectedTournament && (
-              <div style={{ color: '#eee' }}>
-                <h4
-                  style={{
-                    color: '#a800ff',
-                    fontSize: '1.2rem',
-                    marginBottom: '25px',
-                    fontWeight: 800,
-                  }}
-                >
+              <div style={{ color: 'var(--text-secondary)' }}>
+                <h4 style={{ color: 'var(--accent)', fontSize: '1.2rem', marginBottom: '25px', fontWeight: 800 }}>
                   {selectedTournament.name}
                 </h4>
                 {[
@@ -684,35 +419,16 @@ export default function Dashboard() {
                   {
                     label: 'ПРИЗОВИЙ ФОНД',
                     value: `$${Number(selectedTournament.prize_pool).toLocaleString()}`,
-                    color: '#a800ff',
+                    color: 'var(--accent)',
                   },
                   {
                     label: 'ДАТИ',
                     value: `${selectedTournament.start_date} → ${selectedTournament.end_date}`,
                   },
                 ].map(({ label, value, color }) => (
-                  <div
-                    key={label}
-                    style={{
-                      background: '#0a0a0a',
-                      padding: '16px 20px',
-                      borderRadius: '8px',
-                      border: '1px solid #1a1a1a',
-                      marginBottom: '10px',
-                    }}
-                  >
-                    <span
-                      style={{
-                        color: '#444',
-                        display: 'block',
-                        fontSize: '0.6rem',
-                        letterSpacing: '1px',
-                        marginBottom: '5px',
-                      }}
-                    >
-                      {label}
-                    </span>
-                    <span style={{ fontSize: '0.95rem', fontWeight: 700, color: color || '#eee' }}>
+                  <div key={label} className={styles.sidebarDetailCard}>
+                    <span className={styles.sidebarDetailLabel}>{label}</span>
+                    <span className={styles.sidebarDetailValue} style={color ? { color } : undefined}>
                       {value}
                     </span>
                   </div>
